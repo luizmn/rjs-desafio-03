@@ -34,20 +34,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       return [];
     });
 
-  // ___________________BEGIN Stock function____________________
-  const [stockLocal, setStockLocal] = useState<Product[]>(() => {
-    const storagedStock = localStorage.getItem('@RocketShoes:stock');
-
-      if (storagedStock) {
-        return JSON.parse(storagedStock);
-      }
-
-      return [];
-    });
-
-    // ___________________END Stock function____________________
-
-
   const addProduct = async (productId: number) => {
     try {
       const [product, stock] = await Promise.all([
@@ -57,8 +43,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
       const { data: productList} = product;
       const { data: stockList} = stock;
-
-      
+    
       // const verifyStock = stockLocal.map
       
       const productExistInCart = cart.find(product => product.id === productId);
@@ -70,13 +55,16 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           amount: 1,
           }
           setCart([...cart, addNewProductToCart]);
-          localStorage.setItem('@RocketShoes:cart', JSON.stringify([...cart, addNewProductToCart]))
-        } 
+          localStorage.setItem('@RocketShoes:cart', JSON.stringify([...cart, addNewProductToCart]));
+          toast.info("Produto adicionado ao carrinho!");
+        } else {
+          toast.error('Produto sem estoque!'); 
+        }
       } catch {
-        toast.error('Produto sem estoque!'); 
+        toast.error('Erro ao adicionar produto!'); 
         }
       } else {
-        if (stockList.amount > 0 ) {
+        if (stockList.amount > 0 && stockList.amount > productExistInCart.amount) {
         const updateProductInCart = cart.map(cartItem => cartItem.id === productId ? {
           ...cartItem,
           amount: Number(cartItem.amount) + 1
@@ -87,13 +75,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           '@RocketShoes:cart', 
           JSON.stringify(updateProductInCart)
         );
+        toast.info("Produto adicionado ao carrinho!");
+        } else {
+          toast.error('Erro na adição do produto. Produto sem estoque!');  
+        }
       }
-    }
-
     } catch {
-      toast.error('Erro na adição do produto');
+      toast.error('Produto sem estoque!');
     }
-
   };
 
   const removeProduct = (productId: number) => {
@@ -104,6 +93,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         '@RocketShoes:cart', 
         JSON.stringify(removeProductCart)
       );
+      toast.warn("Produto removido do carrinho!");
     } catch {
       toast.error('Erro na remoção do produto');
     }
@@ -114,6 +104,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       localStorage.clear();
       window.location.reload();
+      toast.info("Carrinho vazio!")
     } catch {
     toast.error('Erro na limpeza do carrinho!');
     }
@@ -123,11 +114,27 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     productId,
     amount,
   }: UpdateProductAmount) => {
+
+
+    const [stock] = await Promise.all([
+      api.get(`stock/${productId}`)
+    ]);
+
+    const { data: stockList} = stock;
+
+    const checkCart = cart.find(cartItem => cartItem.id === productId);
+
+    console.log("quantidade memoria")
+    console.log(amount)
+    console.log("qt stock");
+    console.log(stockList.amount)
+    console.log("qt cart");
+    console.log(checkCart!.amount)
     try {
-    
-        const updateProductInCart = cart.map(cartItem => cartItem.id === productId ? {
+      if (amount <= stockList.amount && stockList.amount >= checkCart!.amount) {
+    const updateProductInCart = cart.map(cartItem => cartItem.id === productId ? {
           ...cartItem,
-          amount: Number(amount) //+ amount
+          amount: Number(amount)
         } : cartItem);
 
         setCart(updateProductInCart);
@@ -135,10 +142,13 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           '@RocketShoes:cart', 
           JSON.stringify(updateProductInCart)
         );
-      
-
+        toast.info("Quantidade atualizada no carrinho!");
+      }
+      else { 
+        toast.error('Produto sem estoque!!');
+      }
     } catch {
-      toast.error('Erro ao atualizar quantidade!');
+      toast.error('Erro na alteração de quantidade do produto');
     }
   };
 

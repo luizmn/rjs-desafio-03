@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   MdDelete,
   MdAddCircleOutline,
@@ -36,14 +35,15 @@ const Cart = (): JSX.Element => {
   function handleProductIncrement(product: Product) {
     const productId = product.id;
     const amount = product.amount + 1;
-
+    
     updateProductAmount({productId, amount});
   }
 
   function handleProductDecrement(product: Product) {
     const productId = product.id;
     const amount = product.amount - 1;
-
+console.log("try to decrease amount")
+console.log(amount)
     updateProductAmount({productId, amount});
   }
 
@@ -124,7 +124,12 @@ const Cart = (): JSX.Element => {
 
       <footer>
         <button type="button">Finalizar pedido</button>
-        <button type="button" onClick={handleClearCart}>Esvaziar carrinho</button>
+        <button type="button" onClick={() => 
+          window.confirm(
+            "Deseja realmente esvaziar o carrinho?"
+          ) ? handleClearCart() : window.close
+          // handleClearCart
+        }>Esvaziar carrinho</button>
         <Total>
           <span>TOTAL</span>
           <strong>{total}</strong>
