@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../services/api';
-import { Product, Stock } from '../types';
+import { Product } from '../types';
 
 interface CartProviderProps {
   children: ReactNode;
@@ -106,7 +106,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       window.location.reload();
       toast.info("Carrinho vazio!")
     } catch {
-    toast.error('Erro na limpeza do carrinho!');
+    toast.error('Erro ao esvaziar carrinho!');
     }
   }
 
