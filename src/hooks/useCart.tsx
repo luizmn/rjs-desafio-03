@@ -124,12 +124,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
     const checkCart = cart.find(cartItem => cartItem.id === productId);
 
-    console.log("quantidade memoria")
-    console.log(amount)
-    console.log("qt stock");
-    console.log(stockList.amount)
-    console.log("qt cart");
-    console.log(checkCart!.amount)
     try {
       if (amount <= stockList.amount && stockList.amount >= checkCart!.amount) {
     const updateProductInCart = cart.map(cartItem => cartItem.id === productId ? {
