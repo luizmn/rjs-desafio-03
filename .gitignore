@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.js
+.npm/
+.idea/
+.vscode/
 
 # testing
 /coverage
@@ -22,4 +25,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+/.changelog
+
 *.lock
+*.tgz
+template/src/__tests__/__snapshots__/
